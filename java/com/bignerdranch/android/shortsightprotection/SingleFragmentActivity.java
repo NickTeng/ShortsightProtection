@@ -1,16 +1,15 @@
 package com.bignerdranch.android.shortsightprotection;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 
 /**
- * Created by alex on 2017-07-15.
+ * Created by alex on 2017-07-16.
  */
 
-public abstract class SingleFragmentActivity extends FragmentActivity {
-
+public abstract class SingleFragmentActivity extends Activity {
     protected abstract Fragment createFragment();
 
     @Override
