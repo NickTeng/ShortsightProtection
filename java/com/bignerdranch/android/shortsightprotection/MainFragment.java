@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.afollestad.materialcamera.MaterialCamera;
@@ -20,15 +21,17 @@ import com.afollestad.materialcamera.MaterialCamera;
 import java.io.File;
 import java.text.DecimalFormat;
 
-public class DemoFragment extends Fragment implements View.OnClickListener {
+public class MainFragment extends Fragment implements View.OnClickListener {
 
   private static final int CAMERA_RQ = 6969;
   private static final int PERMISSION_RQ = 84;
+  private Button mExit;
+  private Button mInformation;
 
-  public DemoFragment() {}
+  public MainFragment() {}
 
-  public static DemoFragment getInstance() {
-    DemoFragment fragment = new DemoFragment();
+  public static MainFragment getInstance() {
+    MainFragment fragment = new MainFragment();
     Bundle args = new Bundle();
     fragment.setArguments(args);
     return fragment;
@@ -43,7 +46,29 @@ public class DemoFragment extends Fragment implements View.OnClickListener {
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.fragment_demo, container, false);
+    View v=inflater.inflate(R.layout.fragment_main, container, false);
+    //to use the finish method of the parent activity
+    mExit = (Button)v.findViewById(R.id.exit_button);
+    mExit.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        MainActivity sp=(MainActivity)getActivity();
+        sp.finish();
+      }
+    });
+
+
+    //To set a monitor for information method
+    mInformation=(Button)v.findViewById(R.id.information_button);
+    mInformation.setOnClickListener(new View.OnClickListener(){
+      @Override
+      public void onClick(View view){
+        Intent i=new Intent(getActivity(),InformationActivity.class);
+        startActivity(i);
+
+      }
+    });
+    return v;
   }
 
   @Override
@@ -78,11 +103,11 @@ public class DemoFragment extends Fragment implements View.OnClickListener {
     MaterialCamera materialCamera =
         new MaterialCamera(this)
             .saveDir(saveDir)
-            .showPortraitWarning(true)
+            .showPortraitWarning(false)
             .allowRetry(true)
             .defaultToFrontFacing(true);
 
-
+    materialCamera.stillShot();
     materialCamera.start(CAMERA_RQ);
   }
 
@@ -136,4 +161,6 @@ public class DemoFragment extends Fragment implements View.OnClickListener {
           .show();
     }
   }
+
+
 }

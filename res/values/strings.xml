@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">Shortsight Protection</string>
     <string name="information">HelloWorld</string>
-    <string name="begin_button">Begin!</string>
+    <string name="begin_button">Begin monitoring</string>
+    <string name="settings_button">Settings</string>
+    <string name="information_button">Help</string>
+    <string name="quit_button">Quit</string>
     <string name="demo_from_fragment">Demo from fragment</string>
     <string name="launch_camera">Launch Camera for recording</string>
     <string name="launch_camera_stillshot">Launch Camera for stillshot</string>
