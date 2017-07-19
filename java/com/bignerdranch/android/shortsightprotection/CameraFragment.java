@@ -49,7 +49,7 @@ public class CameraFragment extends Fragment {
                 if (mCamera!=null) {
                     BitmapFactory.Options options=new BitmapFactory.Options();
                     options.inPreferredConfig=Bitmap.Config.ARGB_8888;
-                    Bitmap bm1=BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.me,options);
+                    Bitmap bm1=BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.me7,options);
                     if (bm1==null){
                         Log.e(TAG,"first is null");
                     }
@@ -136,23 +136,16 @@ public class CameraFragment extends Fragment {
     }
 
     public void calculate(Bitmap initialBitmap, Bitmap finalBitmap){
-        int a=mFace1.SetImage1(initialBitmap);
-        if (a==-1){
-            Toast.makeText(getActivity(),"-1",Toast.LENGTH_LONG).show();
-        }else{
-            if (a==0){
-                Toast.makeText(getActivity(),"0",Toast.LENGTH_LONG).show();
-            }
-            else{
-                Toast.makeText(getActivity(),"1",Toast.LENGTH_LONG).show();
-            }
+        mFace1.SetImage1(initialBitmap);
+        if (mFace1.SetImage1(initialBitmap)==-1){
+            return;
         }
-//        mFace2.SetImage2(finalBitmap);
-//        if ((mFace1.GetY1()-mFace1.GetY2())/(mFace1.GetX1()-mFace1.GetX2())>(mFace2.GetY1()-mFace2.GetY2())/(mFace2.GetX1()-mFace2.GetX2())){
-//            Toast.makeText(getActivity(),"lalala",Toast.LENGTH_LONG).show();
-//        }else{
-//            Toast.makeText(getActivity(),"hahaha",Toast.LENGTH_LONG).show();
-//        }
+
+        mFace2.SetImage2(finalBitmap);
+        if (mFace2.SetImage2(finalBitmap)==-1){
+            return;
+        }
+
 
     }
 }

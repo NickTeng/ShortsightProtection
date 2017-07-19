@@ -10,7 +10,7 @@ public class InformationActivity extends SingleFragmentActivity {
 
     @Override
     protected Fragment createFragment(){
-        return new InformationFragment();
+        return new DemoFragment();
     }
 
 }
