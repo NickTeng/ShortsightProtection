@@ -5,11 +5,14 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +20,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.afollestad.materialcamera.MaterialCamera;
-
+import facecam.tsface.TSFaceVerify;
 import java.io.File;
 import java.text.DecimalFormat;
 
@@ -27,6 +30,8 @@ public class MainFragment extends Fragment implements View.OnClickListener {
   private static final int PERMISSION_RQ = 84;
   private Button mExit;
   private Button mInformation;
+  static File saveDir = null;
+  private File mJPG=null;
 
   public MainFragment() {}
 
@@ -91,7 +96,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
   @SuppressWarnings("ResultOfMethodCallIgnored")
   @Override
   public void onClick(View view) {
-    File saveDir = null;
+
 
     if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
         == PackageManager.PERMISSION_GRANTED) {
@@ -109,6 +114,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
     materialCamera.stillShot();
     materialCamera.start(CAMERA_RQ);
+
   }
 
   private String readableFileSize(long size) {
@@ -132,11 +138,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     if (requestCode == CAMERA_RQ) {
       if (resultCode == Activity.RESULT_OK) {
         final File file = new File(data.getData().getPath());
-        Toast.makeText(
-                getActivity(),
-                String.format("Saved to: %s, size: %s", file.getAbsolutePath(), fileSize(file)),
-                Toast.LENGTH_LONG)
-            .show();
+        mJPG=file;
       } else if (data != null) {
         Exception e = (Exception) data.getSerializableExtra(MaterialCamera.ERROR_EXTRA);
         if (e != null) {
@@ -145,6 +147,13 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         }
       }
     }
+
+    if (mJPG == null) {
+      Log.e("save error","saveDir is null");
+      return;
+    }
+    Bitmap bp=j2b(mJPG);
+    calculate(bp);
   }
 
   @Override
@@ -160,7 +169,28 @@ public class MainFragment extends Fragment implements View.OnClickListener {
               Toast.LENGTH_LONG)
           .show();
     }
+
   }
+
+
+
+
+  public Bitmap j2b(File mJpg)
+  {
+    BitmapFactory.Options options=new BitmapFactory.Options();
+    options.inPreferredConfig=Bitmap.Config.ARGB_8888;
+    String path=mJpg.getPath();
+    Bitmap bp= BitmapFactory.decodeFile(path,options);
+    return bp;
+  }
+
+  public void calculate(Bitmap bp){
+    TSFaceVerify ts=new TSFaceVerify();
+    ts.SetFaceWidth(100,1080);
+    int z=ts.SetImage1(bp);
+    Toast.makeText(getActivity(),""+z,Toast.LENGTH_LONG).show();
+  }
+
 
 
 }
