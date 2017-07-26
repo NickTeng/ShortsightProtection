@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -32,6 +33,11 @@ public class MainFragment extends Fragment implements View.OnClickListener {
   private Button mInformation;
   static File saveDir = null;
   private File mJPG=null;
+  float[][] coordinates=new float[2][88];
+
+  private static float DIS20 = -1 ;
+  private float product;
+
 
   public MainFragment() {}
 
@@ -86,7 +92,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     view.findViewById(R.id.launchCamera).setOnClickListener(this);
 
     if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        != PackageManager.PERMISSION_GRANTED) {
+        == PackageManager.PERMISSION_GRANTED) {
       // Request permission to save videos in external storage
       ActivityCompat.requestPermissions(
           getActivity(), new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_RQ);
@@ -107,6 +113,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
     MaterialCamera materialCamera =
         new MaterialCamera(this)
+            .autoSubmit(true)
             .saveDir(saveDir)
             .showPortraitWarning(false)
             .allowRetry(true)
@@ -152,8 +159,13 @@ public class MainFragment extends Fragment implements View.OnClickListener {
       Log.e("save error","saveDir is null");
       return;
     }
+
+
     Bitmap bp=j2b(mJPG);
     calculate(bp);
+
+
+
   }
 
   @Override
@@ -175,6 +187,12 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
 
 
+
+
+
+
+
+
   public Bitmap j2b(File mJpg)
   {
     BitmapFactory.Options options=new BitmapFactory.Options();
@@ -186,11 +204,54 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
   public void calculate(Bitmap bp){
     TSFaceVerify ts=new TSFaceVerify();
-    ts.SetFaceWidth(100,1080);
+    ts.SetFaceWidth(10,1280);
     int z=ts.SetImage1(bp);
-    Toast.makeText(getActivity(),""+z,Toast.LENGTH_LONG).show();
+
+    if (z!=1){
+      Toast.makeText(getActivity(),"you have no face",Toast.LENGTH_LONG).show();
+      return;
+    }
+
+
+    for (int i=0; i<88; i++){
+      coordinates[0][i]=ts.GetKeyPointX(i);
+      coordinates[1][i]=ts.GetKeyPointY(i);
+    }
+
+
+    if(DIS20<0){
+      DIS20=getDistance(17,25);
+      product=DIS20*20;
+      MaterialCamera materialCamera =
+              new MaterialCamera(this)
+                      .autoSubmit(true)
+                      .saveDir(saveDir)
+                      .showPortraitWarning(false)
+                      .allowRetry(false)
+                      .defaultToFrontFacing(true);
+
+      materialCamera.stillShot();
+      materialCamera.start(CAMERA_RQ);
+
+    }else{
+      float myDistance=product/getDistance(17,25);
+      Toast.makeText(getActivity(),"Your distance is "+myDistance+"centimeters",Toast.LENGTH_LONG).show();
+      if (myDistance<25){
+        Intent i=new Intent(getActivity(),Warning.class);
+        startActivity(i);
+      }
+    }
+
+
+    return;
   }
 
+  private float getDistance(int x,int y){
+    float distanceX=coordinates[0][x-1]-coordinates[0][y-1];
+    float distanceY=coordinates[1][x-1]-coordinates[1][y-1];
+    float distance=(float) Math.sqrt(Math.pow((double)distanceX,2)+Math.pow((double)distanceY,2));
+    return distance;
+    }
 
 
 }

@@ -8,4 +8,5 @@
     <string name="demo_from_fragment">Demo from fragment</string>
     <string name="launch_camera">Launch Camera for recording</string>
     <string name="launch_camera_stillshot">Launch Camera for stillshot</string>
+    <string name="warning">!!!TOO CLOSE!!!</string>
 </resources>
