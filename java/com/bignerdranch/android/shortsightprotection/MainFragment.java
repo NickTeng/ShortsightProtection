@@ -202,7 +202,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     return bp;
   }
 
-  public void calculate(Bitmap bp){
+    public void calculate(Bitmap bp){
     TSFaceVerify ts=new TSFaceVerify();
     ts.SetFaceWidth(10,1280);
     int z=ts.SetImage1(bp);

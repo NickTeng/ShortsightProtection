@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Created by alex on 2017-07-10.
  */
-public class InformationFragment extends Fragment{
+public class InformationFragment extends Fragment implements Camera.PreviewCallback{
 
     private static final String TAG="InfoFragment";
     private Camera mCamera;
@@ -39,8 +39,13 @@ public class InformationFragment extends Fragment{
         mSurfaceView=(SurfaceView)v.findViewById(R.id.Preview);
         SurfaceHolder holder= mSurfaceView.getHolder();
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-
         mCamera.setPreviewCallback(this);
+//        mCamera.setPreviewCallback(new Camera.PreviewCallback() {
+//            @Override
+//            public void onPreviewFrame(byte[] bytes, Camera camera) {
+//                Toast.makeText(getActivity(),"lalalalalalala",Toast.LENGTH_LONG).show();
+//            }
+//        });
 
         holder.addCallback(new SurfaceHolder.Callback(){
             public void surfaceCreated(SurfaceHolder holder){
@@ -77,16 +82,7 @@ public class InformationFragment extends Fragment{
 
 
 
-        if (mCamera == null) {
-            Toast.makeText(getActivity(),"mCamera is null", Toast.LENGTH_LONG).show();
-        }
 
-        private Camera.PreviewCallback mPreviewCallback=new Camera.PreviewCallback() {
-            @Override
-            public void onPreviewFrame(byte[] bytes, Camera camera) {
-                Toast.makeText(getActivity(),"lalalalalalala",Toast.LENGTH_LONG).show();
-            }
-        };
 
 
         return v;
@@ -123,7 +119,8 @@ public class InformationFragment extends Fragment{
 
     }
 
-
-
+    public void onPreviewFrame(byte[] bytes, Camera camera) {
+        Toast.makeText(getActivity(),"lalalalalalala",Toast.LENGTH_LONG).show();
+    }
 }
 
