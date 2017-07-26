@@ -39,13 +39,14 @@ public class InformationFragment extends Fragment implements Camera.PreviewCallb
         mSurfaceView=(SurfaceView)v.findViewById(R.id.Preview);
         SurfaceHolder holder= mSurfaceView.getHolder();
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        mCamera.setPreviewCallback(this);
-//        mCamera.setPreviewCallback(new Camera.PreviewCallback() {
-//            @Override
-//            public void onPreviewFrame(byte[] bytes, Camera camera) {
-//                Toast.makeText(getActivity(),"lalalalalalala",Toast.LENGTH_LONG).show();
-//            }
-//        });
+        mCamera=Camera.open(1);
+        mCamera.setDisplayOrientation(90);
+        if (mCamera!=null) {
+            Toast.makeText(getActivity(),"",Toast.LENGTH_LONG).show();
+            mCamera.setOneShotPreviewCallback(this);
+        }else{
+            Toast.makeText(getActivity(),"mCamera is null",Toast.LENGTH_LONG).show();
+        }
 
         holder.addCallback(new SurfaceHolder.Callback(){
             public void surfaceCreated(SurfaceHolder holder){
