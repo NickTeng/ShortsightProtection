@@ -5,8 +5,11 @@
     <string name="settings_button">Settings</string>
     <string name="information_button">Help</string>
     <string name="quit_button">Quit</string>
-    <string name="demo_from_fragment">Demo from fragment</string>
+    <string name="demo_from_fragment">Initialization!</string>
     <string name="launch_camera">Launch Camera for recording</string>
     <string name="launch_camera_stillshot">Launch Camera for stillshot</string>
     <string name="warning">!!!TOO CLOSE!!!</string>
+    <string name="retry_hint">Initialization OK, wanna retry?</string>
+    <string name="retry_button">Retry</string>
+    <string name="no_retry">No. Begin monitoring</string>
 </resources>

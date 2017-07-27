@@ -32,34 +32,6 @@
             android:text="@string/begin_button"
             android:theme="@style/ColoredButton" />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="@dimen/margin_less"
-            android:padding="@dimen/mcam_content_inset"
-            android:text="@string/settings_button"
-            android:theme="@style/ColoredButton" />
-
-        <Button
-            android:id="@+id/information_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="@dimen/margin_less"
-            android:padding="@dimen/mcam_content_inset"
-            android:text="@string/information_button"
-            android:theme="@style/ColoredButton" />
-
-        <Button
-            android:id="@+id/exit_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="@dimen/margin_less"
-            android:padding="@dimen/mcam_content_inset"
-            android:text="@string/quit_button"
-            android:theme="@style/ColoredButton" />
     </LinearLayout>
 
 </FrameLayout>

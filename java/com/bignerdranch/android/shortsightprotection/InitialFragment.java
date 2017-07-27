@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,7 +24,7 @@ import facecam.tsface.TSFaceVerify;
 import java.io.File;
 import java.text.DecimalFormat;
 
-public class MainFragment extends Fragment implements View.OnClickListener {
+public class InitialFragment extends Fragment implements View.OnClickListener {
 
   private static final int CAMERA_RQ = 6969;
   private static final int PERMISSION_RQ = 84;
@@ -39,10 +38,10 @@ public class MainFragment extends Fragment implements View.OnClickListener {
   private float product;
 
 
-  public MainFragment() {}
+  public InitialFragment() {}
 
-  public static MainFragment getInstance() {
-    MainFragment fragment = new MainFragment();
+  public static InitialFragment getInstance() {
+    InitialFragment fragment = new InitialFragment();
     Bundle args = new Bundle();
     fragment.setArguments(args);
     return fragment;
@@ -57,28 +56,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    View v=inflater.inflate(R.layout.fragment_main, container, false);
-    //to use the finish method of the parent activity
-    mExit = (Button)v.findViewById(R.id.exit_button);
-    mExit.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        MainActivity sp=(MainActivity)getActivity();
-        sp.finish();
-      }
-    });
-
-
-    //To set a monitor for information method
-    mInformation=(Button)v.findViewById(R.id.information_button);
-    mInformation.setOnClickListener(new View.OnClickListener(){
-      @Override
-      public void onClick(View view){
-        Intent i=new Intent(getActivity(),InformationActivity.class);
-        startActivity(i);
-
-      }
-    });
+    View v=inflater.inflate(R.layout.fragment_initial, container, false);
     return v;
   }
 
@@ -208,20 +186,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     int z=ts.SetImage1(bp);
 
     if (z!=1){
-      Toast.makeText(getActivity(),"you have no face",Toast.LENGTH_LONG).show();
-      return;
-    }
-
-
-    for (int i=0; i<88; i++){
-      coordinates[0][i]=ts.GetKeyPointX(i);
-      coordinates[1][i]=ts.GetKeyPointY(i);
-    }
-
-
-    if(DIS20<0){
-      DIS20=getDistance(17,25);
-      product=DIS20*20;
+      Toast.makeText(getActivity(),"you have no face,please retry!",Toast.LENGTH_LONG).show();
       MaterialCamera materialCamera =
               new MaterialCamera(this)
                       .autoSubmit(true)
@@ -232,18 +197,21 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
       materialCamera.stillShot();
       materialCamera.start(CAMERA_RQ);
-
-    }else{
-      float myDistance=product/getDistance(17,25);
-      Toast.makeText(getActivity(),"Your distance is "+myDistance+"centimeters",Toast.LENGTH_LONG).show();
-      if (myDistance<25){
-        Intent i=new Intent(getActivity(),Warning.class);
-        startActivity(i);
-      }
+      return;
     }
 
 
-    return;
+    for (int i=0; i<88; i++){
+      coordinates[0][i]=ts.GetKeyPointX(i);
+      coordinates[1][i]=ts.GetKeyPointY(i);
+    }
+
+      DIS20=getDistance(17,25);
+      product=DIS20*20;
+
+      Intent i=new Intent(getActivity(),RetryActivity.class);
+      startActivity(i);
+      return;
   }
 
   private float getDistance(int x,int y){
