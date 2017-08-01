@@ -7,6 +7,7 @@ import android.app.Fragment;
  */
 
 public class RetryActivity extends SingleFragmentActivity {
+
     @Override
     protected Fragment createFragment(){
         return new RetryFragment();

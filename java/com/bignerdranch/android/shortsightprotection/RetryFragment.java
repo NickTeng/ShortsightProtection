@@ -16,8 +16,11 @@ public class RetryFragment extends Fragment {
     private Button mRetryButton;
     private Button mNoButton;
 
+
+
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_retry, parent, false);
+
 
         mRetryButton=(Button)v.findViewById(R.id.retry_button);
         mRetryButton.setOnClickListener(new View.OnClickListener() {

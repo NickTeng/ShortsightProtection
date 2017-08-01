@@ -32,10 +32,10 @@ public class InitialFragment extends Fragment implements View.OnClickListener {
   private Button mInformation;
   static File saveDir = null;
   private File mJPG=null;
-  float[][] coordinates=new float[2][88];
+  private float[][] coordinates=new float[2][88];
 
   private static float DIS20 = -1 ;
-  private float product;
+  public static float product;
 
 
   public InitialFragment() {}
@@ -208,12 +208,15 @@ public class InitialFragment extends Fragment implements View.OnClickListener {
 
       DIS20=getDistance(17,25);
       product=DIS20*20;
+      Toast.makeText(getActivity(),""+DIS20,Toast.LENGTH_LONG).show();
 
       Intent i=new Intent(getActivity(),RetryActivity.class);
       startActivity(i);
       return;
   }
 
+
+//输入坐标返回距离
   private float getDistance(int x,int y){
     float distanceX=coordinates[0][x-1]-coordinates[0][y-1];
     float distanceY=coordinates[1][x-1]-coordinates[1][y-1];
