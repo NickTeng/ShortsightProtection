@@ -28,8 +28,6 @@ public class InitialFragment extends Fragment implements View.OnClickListener {
 
   private static final int CAMERA_RQ = 6969;
   private static final int PERMISSION_RQ = 84;
-  private Button mExit;
-  private Button mInformation;
   static File saveDir = null;
   private File mJPG=null;
   private float[][] coordinates=new float[2][88];
@@ -208,7 +206,9 @@ public class InitialFragment extends Fragment implements View.OnClickListener {
 
       DIS20=getDistance(17,25);
       product=DIS20*20;
-      Toast.makeText(getActivity(),""+DIS20,Toast.LENGTH_LONG).show();
+
+
+      //Toast.makeText(getActivity(),"",Toast.LENGTH_LONG).show();
 
       Intent i=new Intent(getActivity(),RetryActivity.class);
       startActivity(i);
