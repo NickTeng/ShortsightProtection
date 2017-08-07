@@ -50,8 +50,29 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
     private SurfaceView mSurfaceView;
     public static Bitmap bmp;
     private float[][] mCoordinates=new float[2][88];
-    float x,y,z=-1;
+    float x_d,y_d,z_d=-1;
     float final_distance;
+
+
+    SensorManager sensorMgr = (SensorManager) getActivity().getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
+    final Sensor sensor = sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+    SensorEventListener lsn = new SensorEventListener() {
+        @SuppressWarnings("deprecation")
+        //传感器获取值改变时响应此函数
+        public void onSensorChanged(SensorEvent e) {
+            Log.e("xxxxx","xxxxx");
+            x_d = e.values[SensorManager.DATA_X];
+            y_d = e.values[SensorManager.DATA_Y];
+            z_d = e.values[SensorManager.DATA_Z];
+
+        }
+
+        public void onAccuracyChanged(Sensor s, int accuracy) {
+            return;
+        }
+    };
+
 
     @Override
     @SuppressWarnings("deprecation")
@@ -124,6 +145,7 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
         super.onResume();
         mCamera=Camera.open(1);
         mCamera.setDisplayOrientation(90);
+        sensorMgr.registerListener(lsn,sensor,SensorManager.SENSOR_DELAY_NORMAL);
     }
     @Override
     public void onPause(){
@@ -131,6 +153,7 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
         if (mCamera!=null){
             mCamera.release();
             mCamera=null;
+            sensorMgr.unregisterListener(lsn);
         }
 
 
@@ -168,7 +191,8 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
             Log.e("Sys","Error:"+ex.getMessage());
         }
         calculate(bmp);
-
+//        Intent i=new Intent(getActivity(),Warning.class);
+//        startActivity(i);
     }
 
 
@@ -200,10 +224,9 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
         float a=a_p*InitialFragment.mRealEyeDistance/getDistance(mCoordinates,17,25);
         float b=b_p*InitialFragment.mRealEyeDistance/getDistance(mCoordinates,17,25);
         /////This is wrong!!!
-        initUI();
-        Log.e("xxxxx","x="+x);
-        Log.e("xxxxx","y="+y);
-        Log.e("xxxxx","z="+z);
+        Log.e("xxxxx","x="+x_d);
+        Log.e("xxxxx","y="+y_d);
+        Log.e("xxxxx","z="+z_d);
         float theta=0;
         /////////////////////
         int x=0;
@@ -216,7 +239,7 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
             temp_af=(float)Math.sqrt(Math.pow(mDistanceToEye,2)-Math.pow(b+x,2));
             temp_ae=(float)Math.sqrt(Math.pow(temp_af,2)+Math.pow(x,2));
             temp_ab=(float)Math.sqrt(Math.pow(temp_af,2)+Math.pow(a+b+x,2));
-            float temp_min=(float)Math.abs(Math.tan(theta)-((x+((a+b)*temp_ae/(temp_ae+temp_af)))/temp_af));
+            float temp_min=(float)Math.abs(Math.tan(theta)-((x+((a+b)*temp_ae/(temp_ae+temp_ab)))/temp_af));
 
             if (temp_min<min){
                 min=temp_min;
@@ -225,7 +248,7 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
             x++;
         }
         float mPresentNeck=getDistance(mCoordinates,34,49)/getDistance(mCoordinates,17,25)*InitialFragment.mRealEyeDistance;
-        final_distance=(float)(InitialFragment.mOriginalneck*(x+b)/Math.sqrt(Math.pow(InitialFragment.mOriginalneck,2)+Math.pow(mPresentNeck,2)));
+        final_distance=(float)(InitialFragment.mOriginalneck*(min_x+b)/Math.sqrt(Math.pow(InitialFragment.mOriginalneck,2)+Math.pow(mPresentNeck,2)));
 
         return;
     }
@@ -243,28 +266,10 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
 
 
 
-    private void initUI() {
-        SensorManager sensorMgr = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-        final Sensor sensor = sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        SensorEventListener lsn = new SensorEventListener() {
-            @SuppressWarnings("deprecation")
-            //传感器获取值改变时响应此函数
-            public void onSensorChanged(SensorEvent e) {
-                Log.e("xxxxx","xxxxx");
-                x = e.values[SensorManager.DATA_X];
-                y = e.values[SensorManager.DATA_Y];
-                z = e.values[SensorManager.DATA_Z];
 
-            }
 
-            public void onAccuracyChanged(Sensor s, int accuracy) {
-                return;
-            }
-        };
-        sensorMgr.registerListener(lsn,sensor,SensorManager.SENSOR_DELAY_NORMAL);
-        sensorMgr.unregisterListener(lsn);
-    }
+
 
 
 
