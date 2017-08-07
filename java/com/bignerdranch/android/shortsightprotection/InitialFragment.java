@@ -32,9 +32,12 @@ public class InitialFragment extends Fragment implements View.OnClickListener {
   private File mJPG=null;
   private float[][] coordinates=new float[2][88];
 
-  private static float DIS20 = -1 ;
+  private static float DIS30 = -1 ;
   public static float product;
-
+    //this is not final !!!!!!!!!
+   public static float mRealEyeDistance=12;
+    /////////////////////////////////////
+   public static float mOriginalneck;
 
   public InitialFragment() {}
 
@@ -204,15 +207,18 @@ public class InitialFragment extends Fragment implements View.OnClickListener {
       coordinates[1][i]=ts.GetKeyPointY(i);
     }
 
-      DIS20=getDistance(17,25);
-      product=DIS20*20;
+        DIS30=getDistance(17,25);
+        product=DIS30*30;
+
+        float mouth_eye_distance_p=getDistance(34,49);
+        mOriginalneck=mouth_eye_distance_p/DIS30*mRealEyeDistance;
 
 
-      //Toast.makeText(getActivity(),"",Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(),""+DIS30,Toast.LENGTH_LONG).show();
 
-      Intent i=new Intent(getActivity(),RetryActivity.class);
-      startActivity(i);
-      return;
+        Intent i=new Intent(getActivity(),RetryActivity.class);
+        startActivity(i);
+        return;
   }
 
 

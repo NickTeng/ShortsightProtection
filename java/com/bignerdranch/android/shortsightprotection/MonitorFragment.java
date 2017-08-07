@@ -50,7 +50,8 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
     private SurfaceView mSurfaceView;
     public static Bitmap bmp;
     private float[][] mCoordinates=new float[2][88];
-    float x,y,z;
+    float x,y,z=-1;
+    float final_distance;
 
     @Override
     @SuppressWarnings("deprecation")
@@ -191,18 +192,41 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
         }
 
         float mDistanceToEye=(InitialFragment.product)/MonitorFragment.getDistance(mCoordinates,17,25);
-        //this is not final !!!!!!!!!
-        float mRealEyeDistance=12;
-        /////////////////////////////////////
+
         // a,b,c,d and e are based on "the" graph
 
         float b_p=(float)Math.sqrt((double)mCoordinates[1][17]*(double)mCoordinates[1][25]);
         float a_p=mCamera.getParameters().getPreviewSize().height-b_p;
-        float a=a_p*mRealEyeDistance/getDistance(mCoordinates,17,25);
-        float b=b_p*mRealEyeDistance/getDistance(mCoordinates,17,25);
+        float a=a_p*InitialFragment.mRealEyeDistance/getDistance(mCoordinates,17,25);
+        float b=b_p*InitialFragment.mRealEyeDistance/getDistance(mCoordinates,17,25);
+        /////This is wrong!!!
+        initUI();
         Log.e("xxxxx","x="+x);
         Log.e("xxxxx","y="+y);
         Log.e("xxxxx","z="+z);
+        float theta=0;
+        /////////////////////
+        int x=0;
+        float temp_af=(float)Math.sqrt(Math.pow(mDistanceToEye,2)-Math.pow(b+x,2));
+        float temp_ae=(float)Math.sqrt(Math.pow(temp_af,2)+Math.pow(x,2));
+        float temp_ab=(float)Math.sqrt(Math.pow(temp_af,2)+Math.pow(a+b+x,2));
+        float min=(float)Math.abs(Math.tan(theta)-((x+((a+b)*temp_ae/(temp_ae+temp_af)))/temp_af));
+        int min_x=x;
+        while (x<=150){
+            temp_af=(float)Math.sqrt(Math.pow(mDistanceToEye,2)-Math.pow(b+x,2));
+            temp_ae=(float)Math.sqrt(Math.pow(temp_af,2)+Math.pow(x,2));
+            temp_ab=(float)Math.sqrt(Math.pow(temp_af,2)+Math.pow(a+b+x,2));
+            float temp_min=(float)Math.abs(Math.tan(theta)-((x+((a+b)*temp_ae/(temp_ae+temp_af)))/temp_af));
+
+            if (temp_min<min){
+                min=temp_min;
+                min_x=x;
+            }
+            x++;
+        }
+        float mPresentNeck=getDistance(mCoordinates,34,49)/getDistance(mCoordinates,17,25)*InitialFragment.mRealEyeDistance;
+        final_distance=(float)(InitialFragment.mOriginalneck*(x+b)/Math.sqrt(Math.pow(InitialFragment.mOriginalneck,2)+Math.pow(mPresentNeck,2)));
+
         return;
     }
 
