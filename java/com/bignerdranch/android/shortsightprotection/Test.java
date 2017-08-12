@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 /**
  * Created by alex on 2017-08-01.
  */
@@ -28,10 +27,11 @@ public class Test extends Activity {
 
 
 
-        File file = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis()+".jpg");
+        File file = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis()+".png");
         try {
             out = new FileOutputStream(file);
-            MonitorFragment.bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            MonitorFragment.bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
+
             System.out.println("___________保存的__sd___下_______________________");
         } catch (FileNotFoundException e) {
             e.printStackTrace();

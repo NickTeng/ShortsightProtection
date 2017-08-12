@@ -7,6 +7,18 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.BODY_SENSORS"/>
+    <permission android:name="android.permission.SENSOR_ENABLE"
+        android:permissionGroup="android.permission-group.HARDWARE_CONTROLS"
+        android:protectionLevel="dangerous"
+        android:label="@string/permlab_sensor_enable"
+        android:description="@string/permlab_sensor_enable" />
+    <permission android:name="android.permission.SENSOR_INFO"
+        android:permissionGroup="android.permission-group.HARDWARE_CONTROLS"
+        android:protectionLevel="normal"
+        android:label="@string/permlab_sensor_info"
+        android:description="@string/permlab_sensor_info" />
+
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application

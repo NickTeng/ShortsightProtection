@@ -32,6 +32,8 @@
             android:text="@string/begin_button"
             android:theme="@style/ColoredButton" />
 
+
+
     </LinearLayout>
 
 </FrameLayout>

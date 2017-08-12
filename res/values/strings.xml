@@ -12,4 +12,6 @@
     <string name="retry_hint">Initialization OK, wanna retry?</string>
     <string name="retry_button">Retry</string>
     <string name="no_retry">No. Begin monitoring</string>
+    <string name="permlab_sensor_enable">sensor enable</string>
+    <string name="permlab_sensor_info">sensor info</string>
 </resources>

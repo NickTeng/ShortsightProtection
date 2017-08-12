@@ -25,6 +25,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 import com.afollestad.materialcamera.MaterialCamera;
@@ -52,32 +53,33 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
     private float[][] mCoordinates=new float[2][88];
     float x_d,y_d,z_d=-1;
     float final_distance;
+    private SensorManager sensorMgr;
+    private Sensor sensor;
+    private SensorEventListener lsn;
 
-
-    SensorManager sensorMgr = (SensorManager) getActivity().getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
-    final Sensor sensor = sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-    SensorEventListener lsn = new SensorEventListener() {
-        @SuppressWarnings("deprecation")
-        //传感器获取值改变时响应此函数
-        public void onSensorChanged(SensorEvent e) {
-            Log.e("xxxxx","xxxxx");
-            x_d = e.values[SensorManager.DATA_X];
-            y_d = e.values[SensorManager.DATA_Y];
-            z_d = e.values[SensorManager.DATA_Z];
-
-        }
-
-        public void onAccuracyChanged(Sensor s, int accuracy) {
-            return;
-        }
-    };
 
 
     @Override
     @SuppressWarnings("deprecation")
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_monitor, parent, false);
+        sensorMgr = (SensorManager) getActivity().getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
+        sensor = sensorMgr.getDefaultSensor(Sensor.TYPE_GRAVITY);
+
+        lsn = new SensorEventListener() {
+            @SuppressWarnings("deprecation")
+            //传感器获取值改变时响应此函数
+            public void onSensorChanged(SensorEvent e) {
+                x_d = e.values[SensorManager.DATA_X];
+                y_d = e.values[SensorManager.DATA_Y];
+                z_d = e.values[SensorManager.DATA_Z];
+
+            }
+
+            public void onAccuracyChanged(Sensor s, int accuracy) {
+                return;
+            }
+        };
         mSurfaceView=(SurfaceView)v.findViewById(R.id.Preview);
         SurfaceHolder holder= mSurfaceView.getHolder();
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -87,7 +89,6 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
                 try{
                     if (mCamera!=null){
                         mCamera.setPreviewDisplay(holder);
-                        mCamera.setOneShotPreviewCallback(MonitorFragment.this);
                     }
                 }catch(IOException exception){
                     Log.e(TAG,"Error setting up preview",exception);
@@ -109,7 +110,17 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
                 Log.e("adbadb",""+mCamera.getParameters().getPreviewSize().width+"\n"+mCamera.getParameters().getPreviewSize().height);
                 try{
                     mCamera.startPreview();
-                    mCamera.setOneShotPreviewCallback(MonitorFragment.this);
+                    mCamera.autoFocus(new Camera.AutoFocusCallback(){
+                        @Override
+                        public void onAutoFocus(boolean success, Camera camera){
+                            Log.i("alex","autofocua "+success);
+                            if (success){
+                                mCamera.setOneShotPreviewCallback(MonitorFragment.this);
+                            }
+                        }
+                    });
+
+
                 }catch (Exception e){
                     Log.e(TAG,"could not start preview", e);
                     mCamera.release();
@@ -161,38 +172,28 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
 
     public void onPreviewFrame(byte[] data, Camera camera) {
 
-//        Camera.Size size = mCamera.getParameters().getPreviewSize(); //获取预览大小
-//        final int w = size.width;  //宽度
-//        final int h = size.height;
-//        final YuvImage image = new YuvImage(data, ImageFormat.NV21, w, h, null);
-//        ByteArrayOutputStream os = new ByteArrayOutputStream(data.length);
-//        if(!image.compressToJpeg(new Rect(0, 0, w, h), 100, os)){
-//            return;
-//        }
-//        byte[] tmp = os.toByteArray();
-//        BitmapFactory.Options options =new BitmapFactory.Options();
-//        options.inPreferredConfig=Bitmap.Config.ARGB_8888;
-//        bmp = BitmapFactory.decodeByteArray(tmp, 0,tmp.length,options);
+        Camera.Size size = camera.getParameters().getPreviewSize(); //获取预览大小
+        camera.getParameters().setAutoExposureLock(false);
+        camera.getParameters().setExposureCompensation(camera.getParameters().getMaxExposureCompensation());
+        camera.getParameters().setRotation(90);
+        final int w = size.width;
+        final int h = size.height;
+        final YuvImage image = new YuvImage(data, ImageFormat.NV21, w, h, null);
+        ByteArrayOutputStream os = new ByteArrayOutputStream(data.length);
+        if(!image.compressToJpeg(new Rect(0, 0, w, h), 100, os)){
+            return;
+        }
+        byte[] tmp = os.toByteArray();
+        BitmapFactory.Options options =new BitmapFactory.Options();
+        options.inPreferredConfig=Bitmap.Config.ARGB_8888;
+        bmp = rotateMyBitmap(BitmapFactory.decodeByteArray(tmp, 0,tmp.length,options));
+
+
+
+        calculate(bmp);
 //        Intent i=new Intent(getActivity(),Test.class);
 //        startActivity(i);
 
-        Camera.Size size = camera.getParameters().getPreviewSize();
-        try{
-            YuvImage image = new YuvImage(data, ImageFormat.NV21, size.width, size.height, null);
-            if(image!=null){
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                image.compressToJpeg(new Rect(0, 0, size.width, size.height), 80, stream);
-
-                bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
-                stream.close();
-
-            }
-        }catch(Exception ex){
-            Log.e("Sys","Error:"+ex.getMessage());
-        }
-        calculate(bmp);
-//        Intent i=new Intent(getActivity(),Warning.class);
-//        startActivity(i);
     }
 
 
@@ -206,10 +207,13 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
         TSFaceVerify monitorTS=new TSFaceVerify();
         monitorTS.SetFaceWidth(0,1280);
         int z=monitorTS.SetImage1(bp);
-        if (z==-1){
-            Log.e("ffffff","oh no");
-        }
+            Log.e("final distance",""+z);
 
+        if (z==-1){
+            Intent i=new Intent(getActivity(),Test.class);
+        startActivity(i);
+            return;
+        }
         for (int i=0; i<88; i++){
             mCoordinates[0][i]=monitorTS.GetKeyPointX(i);
             mCoordinates[1][i]=monitorTS.GetKeyPointY(i);
@@ -223,11 +227,12 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
         float a_p=mCamera.getParameters().getPreviewSize().height-b_p;
         float a=a_p*InitialFragment.mRealEyeDistance/getDistance(mCoordinates,17,25);
         float b=b_p*InitialFragment.mRealEyeDistance/getDistance(mCoordinates,17,25);
-        /////This is wrong!!!
-        Log.e("xxxxx","x="+x_d);
-        Log.e("xxxxx","y="+y_d);
-        Log.e("xxxxx","z="+z_d);
-        float theta=0;
+        ///////////////////////
+        Log.e("xxxxxx","x="+x_d);
+        Log.e("xxxxxx","y="+y_d);
+        Log.e("xxxxxx","z="+z_d);
+        float theta=(float)(Math.PI-Math.atan(y_d/z_d));
+        Log.e("xxxxxx",""+theta/Math.PI*180);
         /////////////////////
         int x=0;
         float temp_af=(float)Math.sqrt(Math.pow(mDistanceToEye,2)-Math.pow(b+x,2));
@@ -247,8 +252,14 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
             }
             x++;
         }
+        Log.e("final disatnce","vertical="+min_x);
         float mPresentNeck=getDistance(mCoordinates,34,49)/getDistance(mCoordinates,17,25)*InitialFragment.mRealEyeDistance;
         final_distance=(float)(InitialFragment.mOriginalneck*(min_x+b)/Math.sqrt(Math.pow(InitialFragment.mOriginalneck,2)+Math.pow(mPresentNeck,2)));
+        Log.e("final distance",""+final_distance);
+        if (final_distance<RetryFragment.userSetting){
+            Intent i=new Intent(getActivity(),Warning.class);
+            startActivity(i);
+        }
 
         return;
     }
@@ -273,6 +284,16 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
 
 
 
+    public Bitmap rotateMyBitmap(Bitmap bmp){
+        //*****旋转一下
+        Matrix matrix = new Matrix();
+        matrix.postRotate(270);
 
+        Bitmap bitmap = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), Bitmap.Config.ARGB_8888);
+
+        Bitmap nbmp2 = Bitmap.createBitmap(bmp, 0,0, bmp.getWidth(),  bmp.getHeight(), matrix, true);
+        return nbmp2;
+
+    };
 }
 
