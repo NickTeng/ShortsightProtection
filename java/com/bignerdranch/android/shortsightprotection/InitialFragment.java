@@ -32,6 +32,8 @@ public class InitialFragment extends Fragment implements View.OnClickListener {
   static File saveDir = null;
   private File mJPG=null;
   private float[][] coordinates=new float[2][88];
+  public static int InitialHeight;
+  public static int InitialWidth;
 
   private static float DIS30 = -1 ;
   public static float product;
@@ -101,7 +103,6 @@ public class InitialFragment extends Fragment implements View.OnClickListener {
 
     materialCamera.stillShot();
     materialCamera.start(CAMERA_RQ);
-
   }
 
   private String readableFileSize(long size) {

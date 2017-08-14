@@ -52,6 +52,8 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
     public static Bitmap bmp;
     private float[][] mCoordinates=new float[2][88];
     float x_d,y_d,z_d=-1;
+    float mDistanceToEye;
+    float vertical;
     float final_distance;
     private SensorManager sensorMgr;
     private Sensor sensor;
@@ -115,7 +117,7 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
                         public void onAutoFocus(boolean success, Camera camera){
                             Log.i("alex","autofocua "+success);
                             if (success){
-                                mCamera.setOneShotPreviewCallback(MonitorFragment.this);
+                                mCamera.setPreviewCallback(MonitorFragment.this);
                             }
                         }
                     });
@@ -191,8 +193,6 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
 
 
         calculate(bmp);
-//        Intent i=new Intent(getActivity(),Test.class);
-//        startActivity(i);
 
     }
 
@@ -210,35 +210,40 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
             Log.e("final distance",""+z);
 
         if (z==-1){
-            Intent i=new Intent(getActivity(),Test.class);
-        startActivity(i);
             return;
         }
         for (int i=0; i<88; i++){
             mCoordinates[0][i]=monitorTS.GetKeyPointX(i);
             mCoordinates[1][i]=monitorTS.GetKeyPointY(i);
         }
-
-        float mDistanceToEye=(InitialFragment.product)/MonitorFragment.getDistance(mCoordinates,17,25);
+///////////The /2 is because the pixels of IniF is not the same with MonF
+        mDistanceToEye=(InitialFragment.product)/getDistance(mCoordinates,17,25)/2;
 
         // a,b,c,d and e are based on "the" graph
 
         float b_p=(float)Math.sqrt((double)mCoordinates[1][17]*(double)mCoordinates[1][25]);
+        Log.e("final distance","b_p="+b_p);
         float a_p=mCamera.getParameters().getPreviewSize().height-b_p;
+        Log.e("final distance","a_p="+a_p);
+        ///////////////TEST!!!!!///////////////////
         float a=a_p*InitialFragment.mRealEyeDistance/getDistance(mCoordinates,17,25);
         float b=b_p*InitialFragment.mRealEyeDistance/getDistance(mCoordinates,17,25);
-        ///////////////////////
+        Log.e("final distance","a="+a);
+        Log.e("final distance","b="+b);
+        Log.e("final diatance","c="+mDistanceToEye);
+        //////////////////////////////////////////////////////////
         Log.e("xxxxxx","x="+x_d);
         Log.e("xxxxxx","y="+y_d);
         Log.e("xxxxxx","z="+z_d);
-        float theta=(float)(Math.PI-Math.atan(y_d/z_d));
-        Log.e("xxxxxx",""+theta/Math.PI*180);
+        float theta=(float)(Math.PI/2-Math.atan(y_d/z_d));
+        Log.e("final distance","theta="+theta/Math.PI*180);
         /////////////////////
+
         int x=0;
         float temp_af=(float)Math.sqrt(Math.pow(mDistanceToEye,2)-Math.pow(b+x,2));
         float temp_ae=(float)Math.sqrt(Math.pow(temp_af,2)+Math.pow(x,2));
         float temp_ab=(float)Math.sqrt(Math.pow(temp_af,2)+Math.pow(a+b+x,2));
-        float min=(float)Math.abs(Math.tan(theta)-((x+((a+b)*temp_ae/(temp_ae+temp_af)))/temp_af));
+        float min=(float)Math.abs(Math.tan(theta)-((x+((a+b)*temp_ae/(temp_ae+temp_ab)))/temp_af));
         int min_x=x;
         while (x<=150){
             temp_af=(float)Math.sqrt(Math.pow(mDistanceToEye,2)-Math.pow(b+x,2));
@@ -252,14 +257,45 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
             }
             x++;
         }
-        Log.e("final disatnce","vertical="+min_x);
+        vertical=min_x+b;
+        float mDeskDistance=(float)Math.sqrt(Math.pow(mDistanceToEye,2)-Math.pow(vertical,2));
+        Log.e("final disatnce","vertical="+min_x+b);
+
+
         float mPresentNeck=getDistance(mCoordinates,34,49)/getDistance(mCoordinates,17,25)*InitialFragment.mRealEyeDistance;
-        final_distance=(float)(InitialFragment.mOriginalneck*(min_x+b)/Math.sqrt(Math.pow(InitialFragment.mOriginalneck,2)+Math.pow(mPresentNeck,2)));
+        Log.e("debuuuug","mPresentNeck"+mPresentNeck);
+        Log.e("debuuuug","mOriginalNeck"+InitialFragment.mOriginalneck);
+
+        float middle;
+
+        int y=0;
+        middle=y;
+        float min_y=(float)Math.abs(Math.pow((mPresentNeck-y*(vertical-mPresentNeck)/mDeskDistance),2)+Math.pow(y,2)-Math.pow(InitialFragment.mOriginalneck,2));
+        while (y<=150){
+            float temp_min_y=(float)Math.abs(Math.pow((mPresentNeck-y*(vertical-mPresentNeck)/mDeskDistance),2)+Math.pow(y,2)-Math.pow(InitialFragment.mOriginalneck,2));
+            Log.e("equation","sub="+temp_min_y);
+            if (temp_min_y<min_y){
+                min_y=temp_min_y;
+                middle=y;
+            }
+            y++;
+        }
+
+        if (middle==0){
+            middle=1;
+        }
+
+        final_distance=(float)(InitialFragment.mOriginalneck*vertical/middle);
         Log.e("final distance",""+final_distance);
+
+
+
         if (final_distance<RetryFragment.userSetting){
+            Log.e("is working","<30!!!");
             Intent i=new Intent(getActivity(),Warning.class);
             startActivity(i);
         }
+        Log.e("is working",">30");
 
         return;
     }
