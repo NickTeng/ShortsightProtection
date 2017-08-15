@@ -54,10 +54,11 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
     float x_d,y_d,z_d=-1;
     float mDistanceToEye;
     float vertical;
-    float final_distance;
+    public static float final_distance;
     private SensorManager sensorMgr;
     private Sensor sensor;
     private SensorEventListener lsn;
+    private boolean isClose=false;
 
 
 
@@ -117,7 +118,7 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
                         public void onAutoFocus(boolean success, Camera camera){
                             Log.i("alex","autofocua "+success);
                             if (success){
-                                mCamera.setPreviewCallback(MonitorFragment.this);
+                                mCamera.setOneShotPreviewCallback(MonitorFragment.this);
                             }
                         }
                     });
@@ -173,7 +174,9 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
     }
 
     public void onPreviewFrame(byte[] data, Camera camera) {
-
+        if (camera==null){
+            return;
+        }
         Camera.Size size = camera.getParameters().getPreviewSize(); //获取预览大小
         camera.getParameters().setAutoExposureLock(false);
         camera.getParameters().setExposureCompensation(camera.getParameters().getMaxExposureCompensation());
@@ -194,6 +197,11 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
 
         calculate(bmp);
 
+        if (isClose){
+            Intent i=new Intent(getActivity(),Warning.class);
+            startActivity(i);
+        }
+        isClose=false;
     }
 
 
@@ -268,7 +276,7 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
 
         float middle;
 
-        int y=0;
+        float y=0;
         middle=y;
         float min_y=(float)Math.abs(Math.pow((mPresentNeck-y*(vertical-mPresentNeck)/mDeskDistance),2)+Math.pow(y,2)-Math.pow(InitialFragment.mOriginalneck,2));
         while (y<=150){
@@ -278,7 +286,7 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
                 min_y=temp_min_y;
                 middle=y;
             }
-            y++;
+            y=(float)(y+0.1);
         }
 
         if (middle==0){
@@ -292,8 +300,7 @@ public class MonitorFragment extends Fragment implements Camera.PreviewCallback{
 
         if (final_distance<RetryFragment.userSetting){
             Log.e("is working","<30!!!");
-            Intent i=new Intent(getActivity(),Warning.class);
-            startActivity(i);
+            isClose=true;
         }
         Log.e("is working",">30");
 
